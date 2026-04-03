@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b1326;
+  --foreground: #ffffff;
+  
+  --card: #171f33;
+  --card-foreground: #ffffff;
+  --popover: #171f33;
+  --popover-foreground: #ffffff;
+  
+  --primary: #adc6ff;
+  --primary-foreground: #000000;
+  
+  --secondary: #171f33;
+  --secondary-foreground: #ffffff;
+
+  --muted: #2d3449;
+  --muted-foreground: #a1a1aa;
+
+  --accent: #2d3449;
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #424754; 
+  --input: #424754;
+  --ring: #adc6ff;
+
+  --radius: 4px;
+
+  /* Sovereign IDE specific requested vars */
+  --surface: #0b1326;
+  --surface-container: #171f33;
+  --surface-container-highest: #2d3449;
+  --primary-container: #4d8eff;
+  --tertiary: #ffb786;
+  --outline-variant: #424754;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-manrope);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Sovereign specific */
+  --color-surface: var(--surface);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-primary-container: var(--primary-container);
+  --color-tertiary: var(--tertiary);
+  --color-outline-variant: var(--outline-variant);
+
+  /* Shadcn variables mapped to theme */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radius strict 4px */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
   }
-}
+  body {
+    @apply bg-background text-foreground;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* No-line rule: eliminate border for inputs & containers */
+  input, textarea, select, .container-noline {
+    border: none !important;
+    background-color: var(--surface-container);
+  }
+
+  .border, .border-input {
+    border-width: 0px !important;
+  }
 }
