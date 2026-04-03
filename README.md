@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevTask Manager – Frontend Client
+### 42i Technical Assessment
 
-## Getting Started
+Cliente web construido con **Next.js (App Router)**, **Tailwind CSS** y **shadcn/ui** para el challenge técnico *"Task System"*. Se conecta a la API de DevTask Manager para gestionar proyectos y tareas de manera jerárquica.
 
-First, run the development server:
+---
+
+## ✨ Características Principales
+
+### 🎨 Diseño "Sovereign IDE"
+Interfaz premium en **modo oscuro**, optimizada para la productividad de desarrolladores. Paleta basada en `#0b1326` (fondo) y `#171f33` (contenedores), con tipografías `Manrope` (títulos), `Inter` (UI) y `JetBrains Mono` (datos y metadatos).
+
+### 🌳 UX Jerárquica
+Componentes **recursivos** (`TaskItem`) que permiten navegar por infinitos niveles de subtareas de forma fluida. La sangría está matemáticamente limitada a 6 niveles visuales para preservar la legibilidad en pantallas de escritorio, mientras que los datos se siguen anidando sin límite.
+
+### 🗂️ Paneles Contextuales
+Uso de **Sheets** (paneles laterales) y modales para editar título, estado, prioridad, esfuerzo y descripción de cada tarea sin perder el contexto visual de la lista principal. Incluye analíticas de esfuerzo en tiempo real consumidas desde la API.
+
+### 📱 Diseño Responsivo
+Adaptación pragmática para dispositivos móviles: menú hamburguesa con sidebar deslizable en mobile, y ocultamiento de controles secundarios (`Status`, `Priority`, `Effort`) en pantallas pequeñas, priorizando la lectura limpia del árbol de tareas.
+
+---
+
+## 🚀 Cómo Ejecutar el Proyecto (Docker)
+
+El entorno está **100% contenerizado**.
+
+**Pre-requisito:** Haber levantado previamente el contenedor del Backend, que expone la API en el puerto `3001`. Ver instrucciones en [TaskSystem-Back](https://github.com/martinezmauri/TaskSystem-Back).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Clona el repositorio
+git clone https://github.com/martinezmauri/TaskSystem-Front.git
+cd TaskSystem-Front
+
+# 2. Levanta el contenedor del cliente
+docker-compose up --build -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Servicio | URL |
+|---|---|
+| Aplicación web (Next.js) | `http://localhost:3000` |
+| API requerida (Backend) | `http://localhost:3001` |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Stack Técnico
 
-## Learn More
+| Tecnología | Rol |
+|---|---|
+| Next.js 14 (App Router) | Framework React con SSR/RSC |
+| Tailwind CSS | Sistema de estilos utilitario |
+| shadcn/ui | Componentes accesibles (Accordion, Sheet, Dialog, AlertDialog) |
+| Axios | Cliente HTTP hacia la API |
+| lucide-react | Iconografía |
+| date-fns | Formateo de fechas |
+| Docker | Contenerización |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤖 Metodología de Uso de IA
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Durante el desarrollo del cliente web, se utilizó un **ecosistema híbrido de herramientas de IA** para maximizar la productividad técnica y visual:
 
-## Deploy on Vercel
+**Google Stitch** *(IA de diseño de Google)*
+Se utilizó para la conceptualización visual rápida, la resolución de problemas de distribución espacial (especialmente en la adaptación responsiva de la vista móvil) y la ideación de la estructura base de la UI. Sus maquetas y snippets sirvieron como referencia estructural y de diseño.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Modelos Conversacionales** *(Claude Sonnet 4.6 y Gemini 3.1 Pro)*
+Actuaron como *"agentes programadores"* para convertir las referencias visuales de Stitch en componentes funcionales de React usando Tailwind CSS y shadcn/ui. El ensamblaje final, el manejo complejo de estados recursivos y la conexión a la API mediante Axios fueron **auditados, refactorizados y depurados manualmente** para asegurar la máxima calidad arquitectónica.
