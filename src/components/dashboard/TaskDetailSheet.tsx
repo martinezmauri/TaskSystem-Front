@@ -31,7 +31,11 @@ interface TaskDetailSheetProps {
   onTaskUpdated: () => void;
 }
 
-export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailSheetProps) {
+export function TaskDetailSheet({
+  task,
+  onClose,
+  onTaskUpdated,
+}: TaskDetailSheetProps) {
   const [formData, setFormData] = useState({
     title: "",
     status: "TODO",
@@ -69,7 +73,6 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
     if (!task) return;
     setIsSaving(true);
     try {
-      // Calculate only what has changed, or just send the full form state
       await api.patch(`/tasks/${task.id}`, {
         title: formData.title,
         status: formData.status,
@@ -100,32 +103,42 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
   };
 
   const calculateProgress = () => {
-    if (!effortAnalytics || effortAnalytics.totalEffort === 0 || !effortAnalytics.statusBreakdown) return 0;
-    const doneEffort = effortAnalytics.statusBreakdown.find((b: any) => b.status === "DONE")?.effort || 0;
-    return Math.round((doneEffort / effortAnalytics.totalEffort) * 100);
+    if (!effortAnalytics || effortAnalytics.totalEffort === 0) return 0;
+    // Fix: Consumimos doneEffort directamente del objeto retornado por la API
+    return Math.round(
+      (effortAnalytics.doneEffort / effortAnalytics.totalEffort) * 100,
+    );
   };
 
-  const hasChanges = task && (
-    formData.title !== task.title ||
-    formData.status !== task.status ||
-    formData.priority !== task.priority ||
-    Number(formData.effort) !== Number(task.effort) ||
-    formData.description !== (task.description || "")
-  );
+  const hasChanges =
+    task &&
+    (formData.title !== task.title ||
+      formData.status !== task.status ||
+      formData.priority !== task.priority ||
+      Number(formData.effort) !== Number(task.effort) ||
+      formData.description !== (task.description || ""));
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "DONE": return "bg-emerald-500/10 text-emerald-500 hover:border-emerald-500/50";
-      case "IN_PROGRESS": return "bg-blue-500/10 text-blue-500 hover:border-blue-500/50";
-      case "TODO": default: return "bg-slate-500/10 text-slate-400 hover:border-slate-500/50";
+      case "DONE":
+        return "bg-emerald-500/10 text-emerald-500 hover:border-emerald-500/50";
+      case "IN_PROGRESS":
+        return "bg-blue-500/10 text-blue-500 hover:border-blue-500/50";
+      case "TODO":
+      default:
+        return "bg-slate-500/10 text-slate-400 hover:border-slate-500/50";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "HIGH": return "bg-red-500/10 text-red-500 hover:border-red-500/50";
-      case "MEDIUM": return "bg-orange-500/10 text-orange-500 hover:border-orange-500/50";
-      case "LOW": default: return "bg-slate-500/10 text-slate-400 hover:border-slate-500/50";
+      case "HIGH":
+        return "bg-red-500/10 text-red-500 hover:border-red-500/50";
+      case "MEDIUM":
+        return "bg-orange-500/10 text-orange-500 hover:border-orange-500/50";
+      case "LOW":
+      default:
+        return "bg-slate-500/10 text-slate-400 hover:border-slate-500/50";
     }
   };
 
@@ -141,11 +154,15 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
           <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest text-slate-500 uppercase mb-2">
             <span>{task.projectKey}</span>
             <span>•</span>
-            <span>{format(new Date(task.createdAt || new Date()), "MMM dd, yyyy")}</span>
+            <span>
+              {format(new Date(task.createdAt || new Date()), "MMM dd, yyyy")}
+            </span>
           </div>
-          <Input 
+          <Input
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             className="text-2xl font-display font-bold text-slate-100 bg-transparent border-transparent px-0 h-auto focus-visible:ring-0 focus-visible:border-white/20 transition-colors"
             placeholder="Task Title..."
           />
@@ -155,47 +172,80 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
           {/* Properties */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5 align-start">
-              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Status</span>
+              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">
+                Status
+              </span>
               <div className="relative inline-flex items-center self-start">
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
                   className={`appearance-none font-mono text-xs uppercase pl-3 pr-7 py-1.5 rounded cursor-pointer font-bold tracking-wider outline-none border border-transparent transition-colors ${getStatusColor(formData.status)}`}
                 >
-                  <option value="TODO" className="bg-[#171f33] text-slate-300">TODO</option>
-                  <option value="IN_PROGRESS" className="bg-[#171f33] text-blue-500">IN_PROGRESS</option>
-                  <option value="DONE" className="bg-[#171f33] text-emerald-500">DONE</option>
+                  <option value="TODO" className="bg-[#171f33] text-slate-300">
+                    TODO
+                  </option>
+                  <option
+                    value="IN_PROGRESS"
+                    className="bg-[#171f33] text-blue-500"
+                  >
+                    IN_PROGRESS
+                  </option>
+                  <option
+                    value="DONE"
+                    className="bg-[#171f33] text-emerald-500"
+                  >
+                    DONE
+                  </option>
                 </select>
                 <ChevronDown className="w-3.5 h-3.5 opacity-60 absolute right-2 pointer-events-none stroke-[3]" />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 align-start">
-              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Priority</span>
+              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">
+                Priority
+              </span>
               <div className="relative inline-flex items-center self-start">
                 <select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, priority: e.target.value })
+                  }
                   className={`appearance-none font-mono text-xs uppercase pl-3 pr-7 py-1.5 rounded cursor-pointer font-bold tracking-wider outline-none border border-transparent transition-colors ${getPriorityColor(formData.priority)}`}
                 >
-                  <option value="LOW" className="bg-[#171f33] text-slate-400">LOW</option>
-                  <option value="MEDIUM" className="bg-[#171f33] text-orange-500">MEDIUM</option>
-                  <option value="HIGH" className="bg-[#171f33] text-red-500">HIGH</option>
+                  <option value="LOW" className="bg-[#171f33] text-slate-400">
+                    LOW
+                  </option>
+                  <option
+                    value="MEDIUM"
+                    className="bg-[#171f33] text-orange-500"
+                  >
+                    MEDIUM
+                  </option>
+                  <option value="HIGH" className="bg-[#171f33] text-red-500">
+                    HIGH
+                  </option>
                 </select>
                 <ChevronDown className="w-3.5 h-3.5 opacity-60 absolute right-2 pointer-events-none stroke-[3]" />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5 col-span-2 sm:col-span-1 mt-2 sm:mt-0">
-              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Base Effort (h)</span>
+              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">
+                Base Effort (h)
+              </span>
               <div className="relative flex items-center">
                 <Clock className="w-4 h-4 text-slate-500 absolute left-3 pointer-events-none" />
-                <Input 
+                <Input
                   type="number"
                   min="0"
                   step="0.5"
                   value={formData.effort}
-                  onChange={(e) => setFormData({ ...formData, effort: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, effort: Number(e.target.value) })
+                  }
                   className="pl-9 h-8 bg-slate-900/50 border-white/5 text-slate-200 font-mono focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500 max-w-[120px]"
                 />
               </div>
@@ -205,36 +255,63 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
           {/* Effort Analytics */}
           {effortAnalytics && effortAnalytics.totalEffort > 0 && (
             <div className="flex flex-col gap-3 bg-slate-900/50 p-4 rounded-lg border border-white/5">
-               <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider flex items-center gap-2">
-                 Effort Analytics (Tree)
-               </span>
-               <div className="flex items-end justify-between mb-1">
-                 <span className="text-2xl font-light text-slate-300 font-mono">{effortAnalytics.totalEffort}h</span>
-                 <span className="text-sm text-slate-500 font-mono">{progress}% DONE</span>
-               </div>
-               <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                 <div 
-                   className="h-full bg-emerald-500 transition-all duration-500" 
-                   style={{ width: `${progress}%` }} 
-                 />
-               </div>
-               <div className="flex items-center justify-between mt-2">
-                 {effortAnalytics.statusBreakdown?.map((breakdown: any) => (
-                   <div key={breakdown.status} className="flex flex-col">
-                     <span className="text-[9px] font-mono text-slate-500 uppercase">{breakdown.status}</span>
-                     <span className="text-xs font-mono font-medium text-slate-400">{breakdown.effort}h</span>
-                   </div>
-                 ))}
-               </div>
+              <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider flex items-center gap-2">
+                Effort Analytics (Tree)
+              </span>
+              <div className="flex items-end justify-between mb-1">
+                <span className="text-2xl font-light text-slate-300 font-mono">
+                  {effortAnalytics.totalEffort}h
+                </span>
+                <span className="text-sm text-slate-500 font-mono">
+                  {progress}% DONE
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              {/* Fix: Mapeo directo usando las propiedades que expone la API */}
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-mono text-slate-500 uppercase">
+                    TODO
+                  </span>
+                  <span className="text-xs font-mono font-medium text-slate-400">
+                    {effortAnalytics.todoEffort || 0}h
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-mono text-slate-500 uppercase">
+                    IN PROGRESS
+                  </span>
+                  <span className="text-xs font-mono font-medium text-blue-400">
+                    {effortAnalytics.inProgressEffort || 0}h
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-mono text-slate-500 uppercase">
+                    DONE
+                  </span>
+                  <span className="text-xs font-mono font-medium text-emerald-500">
+                    {effortAnalytics.doneEffort || 0}h
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Description */}
           <div className="flex flex-col gap-2 flex-1">
-            <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">Description</span>
+            <span className="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">
+              Description
+            </span>
             <Textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Add a more detailed description..."
               className="flex-1 min-h-[150px] font-mono text-sm bg-slate-900/50 border-white/5 text-slate-200 placeholder:text-slate-600 focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:border-blue-500 resize-none"
             />
@@ -244,30 +321,38 @@ export function TaskDetailSheet({ task, onClose, onTaskUpdated }: TaskDetailShee
         <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/5 pb-4">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" className="text-red-500 hover:text-red-400 hover:bg-red-500/10 font-medium h-9 px-4">
+              <Button
+                variant="ghost"
+                className="text-red-500 hover:text-red-400 hover:bg-red-500/10 font-medium h-9 px-4"
+              >
                 <Trash2 className="w-4 h-4 mr-2" />
-                 Delete Task
+                Delete Task
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-[#171f33] border-slate-800 text-slate-100">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Task</AlertDialogTitle>
                 <AlertDialogDescription className="text-slate-400">
-                  Are you sure? This action cannot be undone. Deleting this task will also permanently delete all its subtasks.
+                  Are you sure? This action cannot be undone. Deleting this task
+                  will also permanently delete all its subtasks.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel className="bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-slate-100">
                   Cancel
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteTask} disabled={isDeleting} className="bg-red-500 hover:bg-red-600 text-white">
+                <AlertDialogAction
+                  onClick={handleDeleteTask}
+                  disabled={isDeleting}
+                  className="bg-red-500 hover:bg-red-600 text-white"
+                >
                   {isDeleting ? "Deleting..." : "Delete"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <Button 
-            onClick={handleSaveChanges} 
+          <Button
+            onClick={handleSaveChanges}
             disabled={isSaving || !hasChanges}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 w-full sm:w-auto h-9"
           >
