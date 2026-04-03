@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import { ChevronRight, PlusCircle, ArrowDownUp, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TaskItemMock } from "./TaskItemMock";
 
 export function TaskListView() {
+  const [tasks, setTasks] = useState<any[]>([]);
+
   return (
     <>
       {/* Breadcrumbs & Actions */}
@@ -57,7 +61,17 @@ export function TaskListView() {
 
       {/* Task Tree Hierarchy */}
       <div className="space-y-4">
-        <TaskItemMock />
+        {tasks.length === 0 ? (
+          <div className="text-center p-8 text-slate-500">
+            No tasks found. Create one to get started!
+          </div>
+        ) : (
+          tasks.map((task) => (
+            <div key={task.id} className="p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm">
+              {task.title}
+            </div>
+          ))
+        )}
       </div>
     </>
   );

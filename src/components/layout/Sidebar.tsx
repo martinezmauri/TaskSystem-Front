@@ -1,7 +1,48 @@
-import { Folder, ClipboardList, LineChart, Plus, Book, HelpCircle } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Folder, Plus, Book, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
+import { useProject } from "@/contexts/ProjectContext";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export function Sidebar() {
+  const {
+    projects,
+    setSelectedProject,
+    isDialogOpen,
+    setIsDialogOpen,
+    fetchProjects,
+  } = useProject();
+  const [newProjectName, setNewProjectName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProjectName.trim()) return;
+    setLoading(true);
+    try {
+      const { data } = await api.post("/projects", { name: newProjectName });
+      setIsDialogOpen(false);
+      setNewProjectName("");
+      await fetchProjects();
+      setSelectedProject(data);
+    } catch (error) {
+      console.error("Error creating project", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <aside className="hidden md:flex flex-col h-screen w-64 bg-slate-100 dark:bg-slate-950 border-r border-slate-200/50 dark:border-slate-800/50 font-sans text-sm font-medium p-4 sticky top-0">
       <div className="mb-8 px-2">
@@ -11,48 +52,75 @@ export function Sidebar() {
         <p className="text-xs text-slate-500">Developer Workspace</p>
       </div>
       <nav className="flex-1 space-y-1">
-        <a
-          className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-900 transition-all duration-200 ease-in-out rounded-md"
-          href="#"
-        >
-          <Folder className="w-5 h-5" />
+        <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
           Projects
-        </a>
-        <a
-          className="flex items-center gap-3 px-3 py-2 bg-white dark:bg-slate-800 text-primary dark:text-primary rounded-lg shadow-sm transition-all duration-200 ease-in-out"
-          href="#"
-        >
-          <ClipboardList className="w-5 h-5" />
-          My Tasks
-        </a>
-        <a
-          className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-900 transition-all duration-200 ease-in-out rounded-md"
-          href="#"
-        >
-          <LineChart className="w-5 h-5" />
-          Effort Analytics
-        </a>
+        </div>
+        {projects.length === 0 ? (
+          <div className="px-3 py-2 text-slate-500 text-xs italic">
+            No projects found
+          </div>
+        ) : (
+          projects.map((project) => (
+            <button
+              key={project.id || project._id || project.name}
+              onClick={() => setSelectedProject(project)}
+              className="w-full flex items-center justify-start gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-900 transition-all duration-200 ease-in-out rounded-md"
+            >
+              <Folder className="w-4 h-4" />
+              {project.name}
+            </button>
+          ))
+        )}
+        <div className="pt-2 px-1">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-[#171f33] border-none text-slate-100 sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl tracking-tight">
+                  Create New Project
+                </DialogTitle>
+                <DialogDescription className="text-slate-400">
+                  Enter a name for your new project workspace.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateProject} className="space-y-4 pt-4">
+                <Input
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Project Name..."
+                  className="font-mono bg-slate-800 text-slate-100 placeholder:text-slate-500 border-none focus-visible:ring-0 h-11"
+                  autoFocus
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsDialogOpen(false)}
+                    className="text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-6 font-bold"
+                  >
+                    {loading ? "Creating..." : "Create Project"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </nav>
-      <div className="mt-auto pt-4 space-y-1">
-        <Button className="w-full mb-4 flex items-center justify-center gap-2 bg-gradient-to-br from-primary-container to-primary text-primary-foreground px-4 py-6 rounded-lg font-semibold shadow-sm hover:opacity-90 transition-all">
-          <Plus className="w-5 h-5" />
-          Create Task
-        </Button>
-        <a
-          className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-900 transition-all duration-200 ease-in-out rounded-md"
-          href="#"
-        >
-          <Book className="w-5 h-5" />
-          Documentation
-        </a>
-        <a
-          className="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-900 transition-all duration-200 ease-in-out rounded-md"
-          href="#"
-        >
-          <HelpCircle className="w-5 h-5" />
-          Support
-        </a>
-      </div>
     </aside>
   );
 }

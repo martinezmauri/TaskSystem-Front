@@ -1,10 +1,10 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { TaskListView } from "@/components/dashboard/TaskListView";
+import { ProjectDashboard } from "@/components/dashboard/ProjectDashboard";
 
 export default function Home() {
   return (
     <DashboardLayout>
-      <TaskListView />
+      <ProjectDashboard />
     </DashboardLayout>
   );
 }
