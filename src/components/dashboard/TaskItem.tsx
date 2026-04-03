@@ -101,7 +101,7 @@ export function TaskItem({
         </span>
       </div>
 
-      <div className="flex items-center gap-3 flex-shrink-0 ml-4 hidden sm:flex h-full">
+      <div className="flex items-center gap-3 flex-shrink-0 ml-4 hidden md:flex h-full">
         {/* Status Native Select Badge */}
         <div className="relative flex items-center">
           <select
